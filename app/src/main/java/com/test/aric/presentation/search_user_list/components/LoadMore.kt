@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Composable
 fun InfiniteListHandler(
     listState: LazyListState,
-    buffer: Int = 5,
+    buffer: Int = 0,
     onLoadMore: () -> Unit
 ) {
     val loadMore = remember {

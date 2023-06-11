@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,9 @@ fun SearchUserListScreen(
     ) {
         val rememberSwipeRefreshState =
             rememberSwipeRefreshState(isRefreshing = viewModel.userList.value.isLoading)
+        val isShowLoadingMore = remember {
+            mutableStateOf(false)
+        }
         SearchBar(
             textValue = viewModel.searchInput.value,
             onClick = { viewModel.searchForUsername(it) })
@@ -41,9 +46,13 @@ fun SearchUserListScreen(
             state = rememberSwipeRefreshState,
             onRefresh = { viewModel.searchForUsername(viewModel.searchInput.value) }) {
             val listState = rememberLazyListState()
+
+
+
             LazyColumn(state = listState) {
                 itemsIndexed(viewModel.userList.value.lists) { index, it ->
                     with(it) {
+                        isShowLoadingMore.value = false
                         GithubCommonListItem(
                             avatar_url,
                             login,
@@ -61,11 +70,14 @@ fun SearchUserListScreen(
                             true
                         )
                     }
+
+                    InfiniteListHandler(listState = listState, buffer = 5) {
+                        viewModel.getPagedUserListByName()
+                        isShowLoadingMore.value = true
+                    }
                 }
             }
-            InfiniteListHandler(listState = listState, buffer = 5) {
-                viewModel.getPagedUserListByName()
-            }
+
         }
     }
 }

@@ -11,16 +11,27 @@ import javax.inject.Inject
 
 class GetReposUseCase @Inject constructor(
     private val repository: GithubRepository
-) {
-    operator fun invoke(user: String): Flow<Resource<List<RepoInfo>>> = flow {
-        try {
-            emit(Resource.Loading<List<RepoInfo>>())
-            val repos = repository.getAllRepos(user)
-            emit(Resource.Success<List<RepoInfo>>(repos))
-        } catch(e: HttpException) {
-            emit(Resource.Error<List<RepoInfo>>(e.localizedMessage ?: "An unexpected error occured"))
-        } catch(e: IOException) {
-            emit(Resource.Error<List<RepoInfo>>("Couldn't reach server. Check your internet connection."))
-        }
+) : BaseUseCase() {
+    operator fun invoke(user: String): Flow<Resource<List<RepoInfo>>> = perform {
+        val reponse =repository.getAllRepos(user)
+
+
+
+        reponse.body()!!
     }
+}
+open class BaseUseCase {
+    fun <T> perform(isShowLoading: Boolean = true, block: suspend () -> T): Flow<Resource<T>> =
+        flow {
+            try {
+                if (isShowLoading) {
+                    emit(Resource.Loading<T>())
+                }
+                emit(Resource.Success<T>(block()))
+            } catch (e: HttpException) {
+                emit(Resource.Error<T>(e.localizedMessage ?: "An unexpected error occured"))
+            } catch (e: IOException) {
+                emit(Resource.Error<T>("Couldn't reach server. Check your internet connection."))
+            }
+        }
 }
