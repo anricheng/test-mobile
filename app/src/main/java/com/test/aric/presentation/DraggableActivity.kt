@@ -1,7 +1,6 @@
 package com.test.aric.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -51,6 +50,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.test.aric.presentation.ui.theme.GithubTheme
 import kotlinx.coroutines.delay
@@ -177,7 +178,12 @@ fun DraggableBoxExample(
 
 ) {
     val configuration = LocalConfiguration.current
-    val itemWith = configuration.screenWidthDp.dp / 4
+    val itemWith = if (configuration.screenWidthDp.dp / 4<configuration.screenHeightDp.dp / 6){
+        configuration.screenWidthDp.dp / 4
+    }else{
+        configuration.screenHeightDp.dp / 6
+    }
+
 
     var text by remember { mutableStateOf("24") }
 
@@ -207,9 +213,9 @@ fun DraggableBoxExample(
         }
     }
 
-    Column{
+    Column(){
 
-        FlowRow {
+        FlowRow (modifier = Modifier.fillMaxWidth(),crossAxisAlignment= FlowCrossAxisAlignment.Center,mainAxisAlignment =FlowMainAxisAlignment.Center){
             range.value.forEach { it ->
                 DraggableBox(
                     { if (it != initialValue.value){
