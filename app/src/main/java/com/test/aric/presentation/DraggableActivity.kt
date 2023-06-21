@@ -1,6 +1,7 @@
 package com.test.aric.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.MaterialTheme
@@ -32,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -189,7 +192,7 @@ fun DraggableBoxExample(
 
 
 
-    LaunchedEffect(stop) {
+    LaunchedEffect(stop.value) {
         while (!stop.value) {
             delay(1000)
             count.value = count.value + 1
@@ -212,12 +215,11 @@ fun DraggableBoxExample(
                     { if (it != initialValue.value){
                         showDialog = true
                     }else{
+                        initialValue.value = it +1
 
                         if(it == 24){
                             stop.value =true
                             showDialog = true
-                        }else{
-                            initialValue.value = it +1
                         }
                     } },
                     it,
@@ -227,28 +229,32 @@ fun DraggableBoxExample(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Text(
+            Text(color = Color(0xffffb6c1),
                 text =
                 if (count.value >= 60) {
-                    "${count.value / 60} 分${count.value.mod(60)} 秒"
+                    "${count.value.div(60)} 分${count.value.mod(60)} 秒"
                 } else {
                     "${count.value} 秒"
                 }
 
             )
-            Button(onClick = {
+
+            Text(color = Color(0xffffb6c1),
+                text = "已经到：${ initialValue.value -1}"
+            )
+            Button(colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xffffb6c1)),onClick = {
                 stop.value = false
                 range.value = range.value.shuffled()
                 count.value = 0
                 initialValue.value = 1
 
             }) {
-                Text(color = Color.Blue, text = "重置")
+                Text(color = Color.White, text = "重置")
             }
         }
 
@@ -258,40 +264,32 @@ fun DraggableBoxExample(
             ) {
                 Box(
                     modifier = Modifier
-                        .background(color = Color.Magenta, shape = RoundedCornerShape(5.dp))
-                        .size(300.dp)
+                        .background(color = Color.White, shape = RoundedCornerShape(5.dp))
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(10.dp)
                         .background(Color.White),
                     contentAlignment = Alignment.Center
                 ) {
                     Column {
-                        Text(text =if ( initialValue.value == 24){
+                        Text(color=Color(0xffffb6c1),text =if ( initialValue.value == 25){
                             val time = count.value
-                            "恭喜小宝贝，你成功了，用时 ${
+                            "恭喜周念初，你成功了，用时 ${
                                 if (time >= 60) {
                                     "${time/ 60} 分${time.mod(60)} 秒"
                                 } else {
                                     "${time} 秒"
                                 }
-                            }"
+                            }，按下重置键可以继续下一轮哦～"
                         }else {
-                            "小宝贝，你点错了～"
-                        })
+                            "周念初，你点错了,应该点：${initialValue.value}"
+                        }, textAlign = TextAlign.Center)
                     }
                 }
             }
     }}
 }
 
-@Composable
-inline fun updatetime(boolean: Boolean,crossinline block:()->Unit){
-    val isStop = rememberUpdatedState(newValue = boolean)
-    LaunchedEffect(Unit){
-        while (isStop.value){
-            delay(1000)
-            block()
-        }
-    }
-}
 
 @Composable
 fun DraggableBox(
@@ -306,7 +304,7 @@ fun DraggableBox(
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
 
-    var borderColor by remember { mutableStateOf(Color.Blue) }
+    var borderColor by remember { mutableStateOf(Color(0XFFb6c1)) }
 
     Box(modifier = Modifier
         .offset(x = (offsetX / d.density).dp, y = (offsetY / d.density).dp)
@@ -316,7 +314,7 @@ fun DraggableBox(
         }
         .padding(1.dp)
         .border(2.dp, borderColor, shape = RoundedCornerShape(4.dp))
-        .background(Color.Blue)
+        .background(Color(0xffffb6c1))
         .pointerInput(Unit) {
             detectDragGestures { change, dragAmount ->
                 change.consume()
