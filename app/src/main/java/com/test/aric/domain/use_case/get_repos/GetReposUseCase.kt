@@ -13,11 +13,7 @@ class GetReposUseCase @Inject constructor(
     private val repository: GithubRepository
 ) : BaseUseCase() {
     operator fun invoke(user: String): Flow<Resource<List<RepoInfo>>> = perform {
-        val reponse =repository.getAllRepos(user)
-
-
-
-        reponse.body()!!
+        repository.getAllRepos(user)
     }
 }
 open class BaseUseCase {

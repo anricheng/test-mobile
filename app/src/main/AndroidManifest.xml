@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GithubApp">
         <activity
-            android:name="com.test.aric.presentation.GithubActivity"
+            android:name="com.test.aric.presentation.DraggableActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.GithubApp.NoActionBar">
